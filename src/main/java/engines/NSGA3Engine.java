@@ -42,6 +42,7 @@ public abstract class NSGA3Engine extends AbstractGeneticEngine {
     public static final boolean DUMP_ALL_GENERATIONS_REF_DIRS = true;
     public static final boolean DUMP_ALL_GENERATIONS_EXTREME_POINTS = true;
     public static boolean TRACK_WINNER_GENERATION = false;
+    public static boolean NOVELTY = false;
 
     protected double[] currentIntercepts;
     protected VirtualIndividual[] currentExtremePoints;
@@ -712,7 +713,7 @@ public abstract class NSGA3Engine extends AbstractGeneticEngine {
             iterationStart();
             // Create the offspring (tournament selection & crossover)
             Individual[] offspringPopulation
-                    = getOffspringPopulation(currentPopulation);
+                    = getOffspringPopulation(currentPopulation, NOVELTY);
             // Mutation (binary & real)
             mutate(offspringPopulation);
             // Update objective values & constraints violation values of the 
@@ -753,15 +754,18 @@ public abstract class NSGA3Engine extends AbstractGeneticEngine {
             // Whatever logic is needed at the end of every iteration
             iterationEnd();
             // ---------------------------- BEGIN ----------------------------
+            double minInterval2 = 0.8;
+            double maxInterval2 = 0.9;
             if (TRACK_WINNER_GENERATION && !rareSolutionFound) {
                 for (Individual individual : currentPopulation) {
-                    if (individual.isFeasible() && individual.real[0] >= 0.9 && individual.real[0] <= 0.901) {
+                    if (individual.isFeasible() && individual.real[0] >= minInterval2 && individual.real[0] <= maxInterval2) {
                         SampleScript.winnerGenerationIndicesStats.addValue(currentGenerationIndex);
                         rareSolutionFound = true;
                         System.out.println(String.format(
                                 "Rare solutions (with x[0] = %5.3f) found at generation: %d%n",
                                 individual.real[0],
                                 currentGenerationIndex));
+                        break;
                     }
                 }
             }

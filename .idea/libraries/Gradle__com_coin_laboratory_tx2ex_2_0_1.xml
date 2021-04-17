@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="Gradle: com.coin-laboratory:tx2ex:2.0.1">
-    <CLASSES>
-      <root url="jar://$MAVEN_REPOSITORY$/com/coin-laboratory/tx2ex/2.0.1/tx2ex-2.0.1.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>

@@ -50,7 +50,7 @@ public class SampleScript extends TestScript {
         OptimizationProblem optimizationProblem = StaXParser.readProblem(in);
 
         // Create Evaluators
-       // IndividualEvaluator individualEvaluator = new ZDT1Evaluator(); // Modify this line to switch between novelty and non-novelty
+        //IndividualEvaluator individualEvaluator = new ZDT1Evaluator(); // Modify this line to switch between novelty and non-novelty
         IndividualEvaluator individualEvaluator = new ZDT1WithNoveltyEvaluator(); // Modify this line to switch between novelty and non-novelty
         IndividualEvaluator individualEvaluatorWithoutNovelty = new ZDT1Evaluator();
         // Throw an error with anything other than 2 objectives
@@ -63,12 +63,15 @@ public class SampleScript extends TestScript {
         Individual[] paretoFront = getApproximateParetoFront(
                 optimizationProblem,
                 individualEvaluatorWithoutNovelty,
-                100,
-                99,
-                100); // Notice that the step size for 3 objective problems is NOT (popSize - 1)
-        int trialsCount = 30;
+                8,
+                7,
+                2); // Notice that the step size for 3 objective problems is NOT (popSize - 1)
+        int trialsCount = 2;
         List<Double> igdList = new ArrayList<>();
         NSGA3Engine.TRACK_WINNER_GENERATION = true;
+
+        NSGA3Engine.NOVELTY = true; // CHANGE THIS LINE TO SWITH BETWEEN STANDARD AND NOVELTY
+
         // Create Engine
         NSGA3Engine geneticEngine = new UnifiedNsga3Engine(optimizationProblem,individualEvaluator);
         // Specify output directory

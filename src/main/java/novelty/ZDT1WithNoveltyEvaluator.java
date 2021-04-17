@@ -10,6 +10,7 @@ import parsing.IndividualEvaluator;
 
 /**
  * ZDT1 Test Problem
+ *
  * @author toshiba
  */
 public class ZDT1WithNoveltyEvaluator extends IndividualEvaluator {
@@ -27,8 +28,8 @@ public class ZDT1WithNoveltyEvaluator extends IndividualEvaluator {
         double sparseness = InvertedNoveltyMetric.calcSparseness(individual);
         // 2 obj
 
-        individual.setObjective(0, x[0] + sparseness);
-        individual.setObjective(1, d * (1.0 - Math.sqrt(x[0] / d)) + sparseness);
+        individual.setObjective(0, x[0] /* + sparseness */);
+        individual.setObjective(1, d * (1.0 - Math.sqrt(x[0] / d)) /* + sparseness */);
 
         //3 obj
 /*
@@ -52,20 +53,35 @@ public class ZDT1WithNoveltyEvaluator extends IndividualEvaluator {
             g[4] = (x[0]-0.60) / 0.60;
             g[5] = -1*x[0]+1.0;
             */
-            double[] g = new double[4];
-            g[0]=x[0];
-            g[1]=(-1*x[0]+0.5)/0.5;
-            g[2]=(x[0]-0.9)/0.9;
-            g[3]=(-1*x[0]+0.901)/0.901;
 
-            // Set constraints vilations
-            for (int i = 0; i < g.length; i++) {
-                if (g[i] < 0) {
-                    individual.setConstraintViolation(i, g[i]);
-                } else {
-                    individual.setConstraintViolation(i, 0);
-                }
+            double maxInterval1 = 0.5;
+            double minInterval2 = 0.8;
+            double maxInterval2 = 0.9;
+
+            if (x[0] > maxInterval1 && x[0] < minInterval2) {
+                individual.setConstraintViolation(0, -1.0 * (Math.min(x[0] - maxInterval1, minInterval2 - x[0])));
+            } else if (x[0] > maxInterval2) {
+                individual.setConstraintViolation(0, -1.0 * Math.min(x[0] - maxInterval2, 1.0 - x[0]));
+            } else {
+                individual.setConstraintViolation(0, 0.0);
+                ;
             }
+
+
+//            double[] g = new double[4];
+//            g[0] = x[0];
+//            g[1] = (-1 * x[0] + 0.5) / 0.5;
+//            g[2] = (x[0] - 0.6) / 0.6;
+//            g[3] = (-1 * x[0] + 0.9) / 0.9;
+//
+//            // Set constraints vilations
+//            for (int i = 0; i < g.length; i++) {
+//                if (g[i] < 0) {
+//                    individual.setConstraintViolation(i, g[i]);
+//                } else {
+//                    individual.setConstraintViolation(i, 0);
+//                }
+//            }
 
             // Announce that objective function values are valid
             individual.validConstraintsViolationValues = true;

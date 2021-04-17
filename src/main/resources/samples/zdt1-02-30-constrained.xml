@@ -25,9 +25,6 @@ or "many-objective" -->
     <!-- constraints -->
     <constraints>
         <constraint type="inequality">0</constraint>
-        <constraint type="inequality">0</constraint>
-        <constraint type="inequality">0</constraint>
-        <constraint type="inequality">0</constraint>
     </constraints>
     <!-- structured reference points -->
     <structured-reference-points steps="99" adaptive="false"/>
@@ -37,7 +34,7 @@ or "many-objective" -->
     </population-size>
     <!-- number of generations -->
     <generations-count>
-        200
+        100
     </generations-count>
     <!-- real crossover & mutation probabilities -->
     <real-crossover-probability>0.9</real-crossover-probability>

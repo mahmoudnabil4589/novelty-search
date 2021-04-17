@@ -4,19 +4,18 @@
  */
 package engines;
 
-import utils.PerformanceMetrics;
 import emo.DoubleAssignmentException;
 import emo.Individual;
 import emo.OptimizationProblem;
 import emo.OptimizationUtilities;
+import parsing.IndividualEvaluator;
+import utils.PerformanceMetrics;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import java.io.File;
-
-import parsing.IndividualEvaluator;
 
 /**
  * @author toshiba
@@ -115,7 +114,7 @@ public class NSGA2Engine extends AbstractGeneticEngine {
             // Whatever logic is needed at the beginning of every iteration
             iterationStart();
             // Create the offspring (tournament selection & crossover)
-            Individual[] offspringPopulation = getOffspringPopulation(currentPopulation);
+            Individual[] offspringPopulation = getOffspringPopulation(currentPopulation, false);
             // Mutation (binary & real)
             mutate(offspringPopulation);
             // Update objective values & constraints violation values of the offspring

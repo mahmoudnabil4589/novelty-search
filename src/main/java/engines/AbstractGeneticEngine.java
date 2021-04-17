@@ -4,23 +4,20 @@
  */
 package engines;
 
+import emo.*;
+import novelty.InvertedNoveltyMetric;
+import org.apache.commons.lang3.SerializationUtils;
+import parsing.IndividualEvaluator;
 import utils.InputOutput;
 import utils.Mathematics;
 import utils.RandomNumberGenerator;
-import emo.DoubleAssignmentException;
-import emo.Individual;
-import emo.IndividualsSet;
-import emo.OptimizationProblem;
-import emo.OptimizationUtilities;
-import emo.RealVariableSpecs;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.HashMap;
-import org.apache.commons.lang3.SerializationUtils;
-import parsing.IndividualEvaluator;
+import java.util.List;
 
 /**
  * This is the superclass of all evolutionary engines. It has the full
@@ -190,6 +187,25 @@ public abstract class AbstractGeneticEngine {
         }
     }
 
+    protected Individual tournamentSelectByNovelty(IndividualsSet subset) {
+        Individual individual1 = subset.getIndividual1();
+        Individual individual2 = subset.getIndividual2();
+        if(RandomNumberGenerator.next() < 0.5) {
+            // If the problem is constrained and at least one of the
+            // individuals under investigation is infeasible return the feasible
+            // one (which is the dominating individual).
+            double sparseness1 = InvertedNoveltyMetric.calcSparseness(individual1);
+            double sparseness2 = InvertedNoveltyMetric.calcSparseness(individual2);
+            if(sparseness1 < sparseness2) {
+                return individual1;
+            } else {
+                return individual2;
+            }
+        } else {
+            return tournamentSelect(subset);
+        }
+    }
+
     /**
      * Create a new population from an already existing population. This method
      * applies tournament selection then crossover to the input population.
@@ -197,7 +213,7 @@ public abstract class AbstractGeneticEngine {
      * @param oldPopulation
      * @return
      */
-    protected Individual[] getOffspringPopulation(Individual[] oldPopulation) {
+    protected Individual[] getOffspringPopulation(Individual[] oldPopulation, boolean novelty) {
         Individual[] newPopulation
                 = new Individual[optimizationProblem.getPopulationSize()];
         int[] a1 = new int[optimizationProblem.getPopulationSize()];
@@ -225,23 +241,41 @@ public abstract class AbstractGeneticEngine {
             a2[i] = temp;
         }
         for (i = 0; i < optimizationProblem.getPopulationSize(); i += 4) {
-            parent1 = tournamentSelect(
-                    new IndividualsSet(oldPopulation[a1[i]],
-                            oldPopulation[a1[i + 1]]));
-            parent2 = tournamentSelect(
-                    new IndividualsSet(oldPopulation[a1[i + 2]],
-                            oldPopulation[a1[i + 3]]));
+            if(novelty) {
+                parent1 = tournamentSelectByNovelty(
+                        new IndividualsSet(oldPopulation[a1[i]],
+                                oldPopulation[a1[i + 1]]));
+                parent2 = tournamentSelectByNovelty(
+                        new IndividualsSet(oldPopulation[a1[i + 2]],
+                                oldPopulation[a1[i + 3]]));
+            } else {
+                parent1 = tournamentSelect(
+                        new IndividualsSet(oldPopulation[a1[i]],
+                                oldPopulation[a1[i + 1]]));
+                parent2 = tournamentSelect(
+                        new IndividualsSet(oldPopulation[a1[i + 2]],
+                                oldPopulation[a1[i + 3]]));
+            }
             childrenSet = crossover(new IndividualsSet(parent1, parent2));
             newPopulation[i] = childrenSet.getIndividual1();
             newPopulation[i + 1] = childrenSet.getIndividual2();
-
-            parent1 = tournamentSelect(
-                    new IndividualsSet(oldPopulation[a2[i]],
-                            oldPopulation[a2[i + 1]]));
-            parent2 = tournamentSelect(
-                    new IndividualsSet(
-                            oldPopulation[a2[i + 2]],
-                            oldPopulation[a2[i + 3]]));
+            if(novelty) {
+                parent1 = tournamentSelectByNovelty(
+                        new IndividualsSet(oldPopulation[a2[i]],
+                                oldPopulation[a2[i + 1]]));
+                parent2 = tournamentSelectByNovelty(
+                        new IndividualsSet(
+                                oldPopulation[a2[i + 2]],
+                                oldPopulation[a2[i + 3]]));
+            } else {
+                parent1 = tournamentSelect(
+                        new IndividualsSet(oldPopulation[a2[i]],
+                                oldPopulation[a2[i + 1]]));
+                parent2 = tournamentSelect(
+                        new IndividualsSet(
+                                oldPopulation[a2[i + 2]],
+                                oldPopulation[a2[i + 3]]));
+            }
             childrenSet = crossover(new IndividualsSet(parent1, parent2));
             newPopulation[i + 2] = childrenSet.getIndividual1();
             newPopulation[i + 3] = childrenSet.getIndividual2();
